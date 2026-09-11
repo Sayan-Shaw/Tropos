@@ -1,1 +1,69 @@
+# GeoSAM-RT Training Configuration
+# ===================================
+
+# ── Data paths ──────────────────────────────────────────
+data:
+  dicom_root: "/mnt/c/Users/ANT-PC/Desktop/sayan/ProstateX/PROSTATEx_Train/PROSTATEx"
+  masks_root: "/mnt/c/Users/ANT-PC/Desktop/sayan/ProstateX/PROSTATEx_github/PROSTATEx_masks-master"
+  mask_subdir: "Files/prostate/mask_prostate"   # whole-gland; change for zones
+  cache_dir:  "./cache"
+  normalize:  "zscore"         # "zscore", "minmax", or "none"
+
+  # Expected in-plane dimensions (flag if different)
+  expected_dims:
+    axial:    [384, 384]
+    sagittal: [320, 320]
+    coronal:  [320, 320]
+
+  box_pad: 10                  # padding around bbox prompt
+
+# ── MedSAM2 model ──────────────────────────────────────
+model:
+  sam2_checkpoint: "/mnt/c/Users/ANT-PC/Desktop/sayan/code/CorssViewVisualization/MedSam2/MedSAM2/checkpoints/MedSAM2_latest.pt"
+  sam2_config:     "configs/sam2.1_hiera_t512.yaml"
+  device:          "cuda"
+  embed_dim:       256         # Hiera-Tiny output dim
+  prompt_mode:     "box"       # "box", "box_keyframe", "all", "keyframe"
+  min_fg_px:       15
+
+# ── LoRA ────────────────────────────────────────────────
+lora:
+  rank:    4
+  alpha:   8.0
+  dropout: 0.1
+
+# ── Loss weights ────────────────────────────────────────
+loss:
+  lambda_boundary:      0.5
+  lambda_consistency:   0.3
+  boundary_warmup_frac: 0.2    # ramp boundary from 0 over first 20%
+
+# ── Optimizer ───────────────────────────────────────────
+optimizer:
+  type:         "adamw"
+  lr:           1.0e-4
+  weight_decay: 1.0e-2
+  grad_clip:    1.0            # max_norm for gradient clipping
+
+# ── Scheduler ───────────────────────────────────────────
+scheduler:
+  type:        "cosine"
+  warmup_frac: 0.05            # warmup 5% of total steps
+  min_lr:      1.0e-6
+
+# ── Training loop ──────────────────────────────────────
+training:
+  epochs:          50
+  patience:        10          # early stopping on val round-trip Dice
+  val_split:       0.15        # fraction of patients for validation
+  seed:            42
+  save_every:      5           # save checkpoint every N epochs
+  log_dir:         "./logs"
+  checkpoint_dir:  "./checkpoints"
+
+# ── Output ──────────────────────────────────────────────
+output:
+  dir:             "./output"
+  save_viz:        true
+  viz_every:       10          # save visualization every N epochs
 
