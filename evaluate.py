@@ -5,7 +5,7 @@ evaluate.py
 Quantitative evaluation of round-trip segmentation quality.
 
 Metrics (all computed on the axial grid):
-    - Volume Dice
+    - Volume Dice -
     - Per-slice Dice
     - Hausdorff distance 95th percentile
     - Boundary F1 (precision/recall at boundary)
